@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/app/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
@@ -27,21 +27,25 @@
                 app:cardCornerRadius="24dp"
                 app:cardBackgroundColor="#F0F4EF"
                 app:cardElevation="0dp">
+
                 <TextView
+                    android:id="@+id/tvInisial"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:text="T"
                     android:gravity="center"
                     android:textSize="20sp"
                     android:textStyle="bold"
-                    android:textColor="#1D2F17"/>
+                    android:textColor="#1D2F17" />
             </com.google.android.material.card.MaterialCardView>
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/imgAvatar"
+                android:layout_toStartOf="@+id/btnMore"
                 android:layout_marginStart="12dp"
+                android:layout_marginEnd="8dp"
                 android:orientation="vertical">
 
                 <TextView
@@ -51,24 +55,25 @@
                     android:text="Tahu Kuning"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    android:textColor="#1A1A1A"/>
+                    android:textColor="#1A1A1A" />
 
                 <TextView
                     android:id="@+id/tvIdParam"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="PPM_1777516353942 • Standar ha..."
+                    android:text="Standar hasil produksi"
                     android:textSize="12sp"
-                    android:textColor="#6B7262"/>
+                    android:textColor="#6B7262" />
             </LinearLayout>
 
             <ImageView
+                android:id="@+id/btnMore"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:src="@android:drawable/ic_menu_more"
-                app:tint="#6B7262"/>
+                app:tint="#6B7262" />
         </RelativeLayout>
 
         <LinearLayout
@@ -79,6 +84,7 @@
             android:gravity="center_vertical">
 
             <TextView
+                android:id="@+id/badgeAktif"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Aktif"
@@ -87,7 +93,7 @@
                 android:background="@drawable/bg_badge_yellow"
                 android:textColor="#856404"
                 android:textSize="11sp"
-                android:layout_marginEnd="8dp"/>
+                android:layout_marginEnd="8dp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -98,12 +104,12 @@
                 android:background="@drawable/bg_badge_blue"
                 android:textColor="#004085"
                 android:textSize="11sp"
-                android:layout_marginEnd="8dp"/>
+                android:layout_marginEnd="8dp" />
 
             <View
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_weight="1"/>
+                android:layout_weight="1" />
 
             <TextView
                 android:id="@+id/tvHasil"
@@ -111,7 +117,7 @@
                 android:layout_height="wrap_content"
                 android:text="96 pcs"
                 android:textSize="16sp"
-                android:textColor="#6B7262"/>
+                android:textColor="#6B7262" />
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

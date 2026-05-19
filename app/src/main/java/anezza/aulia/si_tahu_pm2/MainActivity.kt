@@ -2,6 +2,8 @@ package anezza.aulia.si_tahu_pm2
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -10,22 +12,24 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import anezza.aulia.si_tahu_pm2.databinding.ActivityMainBinding
 import com.android.volley.Request
-import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import org.json.JSONObject
 
 class MainActivity : AppCompatActivity() {
+
     lateinit var b: ActivityMainBinding
     lateinit var produkAdapter: AdapterDataProduk
-    var daftarProduk = mutableListOf<HashMap<String, String>>()
 
-    // Gunakan IP Laptop kamu agar bisa diakses dari HP/Emulator
-    val urlShow = "http://192.168.1.22:8000/api/produk"
+    private val semuaProduk = mutableListOf<HashMap<String, String>>()
+    private val daftarProduk = mutableListOf<HashMap<String, String>>()
+
+    private val urlShow = ApiConfig.PRODUK_URL
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         b = ActivityMainBinding.inflate(layoutInflater)
         setContentView(b.root)
 
@@ -35,29 +39,32 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        // 1. Setup RecyclerView
         produkAdapter = AdapterDataProduk(this, daftarProduk)
         b.listProduk.layoutManager = LinearLayoutManager(this)
         b.listProduk.adapter = produkAdapter
 
-        // 2. Tombol Cari
+        // Filter langsung jalan seperti di web. Tombol hanya untuk reset pencarian.
+        b.btnFind.text = "RESET"
         b.btnFind.setOnClickListener {
-            showDataProduk(b.edCariProduk.text.toString().trim())
+            b.edCariProduk.setText("")
+            filterProduk("")
         }
 
-        // 3. Tombol Tambah (FAB)
+        b.edCariProduk.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                filterProduk(s?.toString().orEmpty())
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
         b.btnKeFormTambah.setOnClickListener {
-            val intent = Intent(this, TambahProdukActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, TambahProdukActivity::class.java))
         }
 
-        // 4. Navigasi Bawah
         b.bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_stok -> {
-                    // Kita sudah di halaman stok, jadi tidak perlu pindah
-                    true
-                }
+                R.id.nav_stok -> true
                 R.id.nav_harga -> {
                     startActivity(Intent(this, HargaActivity::class.java))
                     true
@@ -73,36 +80,74 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        showDataProduk("")
+        showDataProduk()
     }
 
-    fun showDataProduk(nama: String) {
-        val request = StringRequest(Request.Method.GET, urlShow,
+    fun showDataProduk(nama: String = b.edCariProduk.text.toString().trim()) {
+        val request = StringRequest(
+            Request.Method.GET,
+            urlShow,
             { response ->
-                daftarProduk.clear()
+                semuaProduk.clear()
+
                 val jsonObject = JSONObject(response)
                 val jsonArray = jsonObject.getJSONArray("data")
 
                 for (x in 0 until jsonArray.length()) {
                     val item = jsonArray.getJSONObject(x)
                     val map = HashMap<String, String>()
-                    map["id"] = item.getString("id")
-                    map["kodeProduk"] = item.getString("kodeProduk")
-                    map["namaProduk"] = item.getString("namaProduk")
-                    map["jenisProduk"] = item.getString("jenisProduk")
-                    map["stok"] = item.getString("stokSaatIni")
-                    map["satuan"] = item.getString("satuan")
-                    map["stokMinimum"] = item.getString("stokMinimum")
-                    map["aktifDijual"] = item.getString("aktifDijual")
-                    map["tampilDiKasir"] = item.getString("tampilDiKasir")
-                    daftarProduk.add(map)
+
+                    map["id"] = item.optString("id", "")
+                    map["kodeProduk"] = item.optString("kodeProduk", "")
+                    map["namaProduk"] = item.optString("namaProduk", "")
+                    map["jenisProduk"] = item.optString("jenisProduk", "")
+                    map["stok"] = item.optString("stokSaatIni", "0")
+                    map["satuan"] = item.optString("satuan", "")
+                    map["stokMinimum"] = item.optString("stokMinimum", "0")
+                    map["aktifDijual"] = item.boolString("aktifDijual")
+                    map["tampilDiKasir"] = item.boolString("tampilDiKasir")
+
+                    semuaProduk.add(map)
                 }
-                produkAdapter.notifyDataSetChanged()
+
+                filterProduk(nama)
             },
             { error ->
-                Toast.makeText(this, "Gagal konek API: ${error.message}", Toast.LENGTH_SHORT).show()
-            })
+                val pesan = error.networkResponse?.data?.let { String(it) } ?: error.toString()
+                Toast.makeText(this, "Gagal konek API: $pesan", Toast.LENGTH_LONG).show()
+            }
+        )
 
         Volley.newRequestQueue(this).add(request)
+    }
+
+    private fun filterProduk(keyword: String) {
+        val cari = keyword.trim().lowercase()
+
+        daftarProduk.clear()
+
+        if (cari.isEmpty()) {
+            daftarProduk.addAll(semuaProduk)
+        } else {
+            daftarProduk.addAll(
+                semuaProduk.filter { data ->
+                    val nama = data["namaProduk"].orEmpty().lowercase()
+                    val kode = data["kodeProduk"].orEmpty().lowercase()
+                    val jenis = data["jenisProduk"].orEmpty().lowercase()
+
+                    nama.contains(cari) || kode.contains(cari) || jenis.contains(cari)
+                }
+            )
+        }
+
+        produkAdapter.notifyDataSetChanged()
+    }
+}
+
+private fun JSONObject.boolString(key: String): String {
+    return when (val value = opt(key)) {
+        is Boolean -> if (value) "1" else "0"
+        is Number -> if (value.toInt() != 0) "1" else "0"
+        else -> if (optString(key).equals("true", true) || optString(key) == "1") "1" else "0"
     }
 }

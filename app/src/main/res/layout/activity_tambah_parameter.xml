@@ -27,17 +27,30 @@
                 android:src="@android:drawable/ic_menu_revert"
                 app:tint="#1A1A1A" />
 
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Form Parameter"
-                android:textColor="#1A1A1A"
-                android:textSize="22sp"
-                android:textStyle="bold" />
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Form Parameter"
+                    android:textColor="#1A1A1A"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Standar hasil produksi"
+                    android:textColor="#6B7262"
+                    android:textSize="14sp" />
+            </LinearLayout>
         </LinearLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
@@ -48,11 +61,12 @@
             app:boxStrokeColor="#1A1A1A"
             app:hintEnabled="false">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etNamaProduk"
+            <AutoCompleteTextView
+                android:id="@+id/spinnerProduk"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Nama produk"
+                android:hint="Pilih produk dasar"
+                android:inputType="none"
                 android:padding="16dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -81,7 +95,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="16dp"
             app:boxCornerRadiusBottomEnd="8dp"
             app:boxCornerRadiusBottomStart="8dp"
             app:boxCornerRadiusTopEnd="8dp"
@@ -97,6 +111,50 @@
                 android:padding="16dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:boxCornerRadiusBottomEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusTopStart="8dp"
+            app:boxStrokeColor="#1A1A1A"
+            app:hintEnabled="false">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etCatatan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Catatan (opsional)"
+                android:minLines="2"
+                android:gravity="top"
+                android:padding="16dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@android:color/white"
+            app:strokeWidth="1dp"
+            app:strokeColor="#D1D5D1">
+
+            <CheckBox
+                android:id="@+id/cbAktif"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text="Parameter aktif"
+                android:textSize="16sp"
+                android:textColor="#1A1A1A"
+                android:checked="true"
+                android:buttonTint="#344E2D" />
+        </com.google.android.material.card.MaterialCardView>
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSimpanParameter"
             android:layout_width="match_parent"
@@ -109,5 +167,4 @@
             app:cornerRadius="12dp" />
 
     </LinearLayout>
-
 </ScrollView>

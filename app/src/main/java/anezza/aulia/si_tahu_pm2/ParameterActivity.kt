@@ -17,11 +17,8 @@ class ParameterActivity : AppCompatActivity() {
     private lateinit var b: ActivityParameterBinding
     private lateinit var adapter: ParameterAdapter
 
-    private val listParameter =
-        ArrayList<HashMap<String, String>>()
-
-    private val urlGet =
-        "http://192.168.1.22:8000/api/parameter-produk"
+    private val listParameter = ArrayList<HashMap<String, String>>()
+    private val urlGet = ApiConfig.PARAMETER_URL
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,108 +29,73 @@ class ParameterActivity : AppCompatActivity() {
         setupRecyclerView()
 
         b.btnTambahParameter.setOnClickListener {
-
-            startActivity(
-                Intent(
-                    this,
-                    TambahParameterActivity::class.java
-                )
-            )
+            startActivity(Intent(this, TambahParameterActivity::class.java))
         }
 
-        b.btnBack.setOnClickListener {
-            finish()
-        }
+        b.btnBack.setOnClickListener { finish() }
 
         getData()
     }
 
     private fun setupRecyclerView() {
-
-        adapter =
-            ParameterAdapter(this, listParameter)
-
-        b.rvParameter.layoutManager =
-            LinearLayoutManager(this)
-
-        b.rvParameter.adapter =
-            adapter
+        adapter = ParameterAdapter(this, listParameter)
+        b.rvParameter.layoutManager = LinearLayoutManager(this)
+        b.rvParameter.adapter = adapter
     }
 
     fun getData() {
-
         val request = StringRequest(
             Request.Method.GET,
             urlGet,
-
             { response ->
-
                 try {
-
                     listParameter.clear()
 
-                    val jsonObject =
-                        JSONObject(response)
-
-                    val jsonArray =
-                        jsonObject.getJSONArray("data")
+                    val jsonObject = JSONObject(response)
+                    val jsonArray = jsonObject.getJSONArray("data")
 
                     for (i in 0 until jsonArray.length()) {
+                        val obj = jsonArray.getJSONObject(i)
+                        val map = HashMap<String, String>()
 
-                        val obj =
-                            jsonArray.getJSONObject(i)
-
-                        val map =
-                            HashMap<String, String>()
-
-                        map["id"] =
-                            obj.optString("id", "")
-
-                        map["namaProduk"] =
-                            obj.optString("namaProduk", "")
-
-                        map["hasilPerProduksi"] =
-                            obj.optString("hasilPerProduksi", "")
-
-                        map["satuanHasil"] =
-                            obj.optString("satuanHasil", "")
+                        map["id"] = obj.optString("id", "")
+                        map["idProduk"] = obj.optString("idProduk", "")
+                        map["kodeProduk"] = obj.optString("kodeProduk", "")
+                        map["namaProduk"] = obj.optString("namaProduk", "")
+                        map["hasilPerProduksi"] = obj.optString("hasilPerProduksi", "")
+                        map["satuanHasil"] = obj.optString("satuanHasil", "")
+                        map["aktif"] = obj.boolString("aktif")
+                        map["catatan"] = obj.optString("catatan", "")
 
                         listParameter.add(map)
                     }
 
                     adapter.notifyDataSetChanged()
-
                 } catch (e: Exception) {
-
-                    Log.e(
-                        "PARAM_PARSE",
-                        e.message.toString()
-                    )
+                    Log.e("PARAM_PARSE", e.message.toString())
+                    Toast.makeText(this, "Gagal parsing data parameter", Toast.LENGTH_LONG).show()
                 }
             },
-
             { error ->
-
-                Log.e(
-                    "PARAM_ERROR",
-                    error.toString()
-                )
-
-                Toast.makeText(
-                    this,
-                    error.toString(),
-                    Toast.LENGTH_LONG
-                ).show()
+                val pesan = error.networkResponse?.data?.let { String(it) } ?: error.toString()
+                Log.e("PARAM_ERROR", pesan)
+                Toast.makeText(this, pesan, Toast.LENGTH_LONG).show()
             }
         )
 
-        Volley.newRequestQueue(this)
-            .add(request)
+        Volley.newRequestQueue(this).add(request)
     }
 
     override fun onResume() {
         super.onResume()
-
         getData()
+    }
+}
+
+private fun JSONObject.boolString(key: String): String {
+    return when (val value = opt(key)) {
+        is Boolean -> if (value) "1" else "0"
+        is Number -> if (value.toInt() != 0) "1" else "0"
+        else -> if (optString(key).equals("true", true) || optString(key) == "1") "1" else "0"
     }
 }

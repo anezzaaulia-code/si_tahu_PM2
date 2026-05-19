@@ -19,136 +19,60 @@ class ParameterAdapter(
     private val list: ArrayList<HashMap<String, String>>
 ) : RecyclerView.Adapter<ParameterAdapter.ViewHolder>() {
 
-    class ViewHolder(
-        val binding: ItemParameterBinding
-    ) : RecyclerView.ViewHolder(binding.root)
+    class ViewHolder(val binding: ItemParameterBinding) : RecyclerView.ViewHolder(binding.root)
 
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): ViewHolder {
-
-        val binding = ItemParameterBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
-        )
-
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val binding = ItemParameterBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 
-    override fun onBindViewHolder(
-        holder: ViewHolder,
-        position: Int
-    ) {
-
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val data = list[position]
+        val namaProduk = data["namaProduk"].orEmpty()
+        val hasil = data["hasilPerProduksi"].orEmpty()
+        val satuan = data["satuanHasil"].orEmpty()
+        val aktif = data["aktif"] == "1"
 
-        holder.binding.tvNamaProduk.text =
-            data["namaProduk"]
-
-        holder.binding.tvIdParam.text =
-            "${data["id"]} • Standar hasil"
-
-        val hasil =
-            data["hasilPerProduksi"]
-
-        val satuan =
-            data["satuanHasil"]
-
-        holder.binding.tvHasil.text =
-            "$hasil $satuan"
-
-        // KLIK ITEM
-        holder.itemView.setOnClickListener {
-
-            showPopup(
-                it,
-                data
-            )
+        with(holder.binding) {
+            tvInisial.text = if (namaProduk.isNotEmpty()) namaProduk.substring(0, 1).uppercase() else "-"
+            tvNamaProduk.text = namaProduk
+            tvIdParam.text = "Standar hasil produksi"
+            tvHasil.text = "$hasil $satuan"
+            badgeAktif.text = if (aktif) "Aktif" else "Nonaktif"
+            btnMore.setOnClickListener { showPopup(it, data) }
+            root.setOnClickListener { showPopup(it, data) }
         }
     }
 
-    private fun showPopup(
-        view: View,
-        data: HashMap<String, String>
-    ) {
-
-        val popup =
-            PopupMenu(context, view)
-
+    private fun showPopup(view: View, data: HashMap<String, String>) {
+        val popup = PopupMenu(context, view)
         popup.menu.add("Edit")
         popup.menu.add("Delete")
 
         popup.setOnMenuItemClickListener {
-
             when (it.title.toString()) {
-
-                // =====================
-                // EDIT
-                // =====================
                 "Edit" -> {
-
-                    val intent =
-                        Intent(
-                            context,
-                            TambahParameterActivity::class.java
-                        )
-
-                    intent.putExtra(
-                        "MODE",
-                        "EDIT"
-                    )
-
-                    intent.putExtra(
-                        "id",
-                        data["id"]
-                    )
-
-                    intent.putExtra(
-                        "namaProduk",
-                        data["namaProduk"]
-                    )
-
-                    intent.putExtra(
-                        "hasilPerProduksi",
-                        data["hasilPerProduksi"]
-                    )
-
-                    intent.putExtra(
-                        "satuanHasil",
-                        data["satuanHasil"]
-                    )
-
+                    val intent = Intent(context, TambahParameterActivity::class.java)
+                    intent.putExtra("MODE", "EDIT")
+                    intent.putExtra("id", data["id"])
+                    intent.putExtra("idProduk", data["idProduk"])
+                    intent.putExtra("namaProduk", data["namaProduk"])
+                    intent.putExtra("hasilPerProduksi", data["hasilPerProduksi"])
+                    intent.putExtra("satuanHasil", data["satuanHasil"])
+                    intent.putExtra("aktif", data["aktif"])
+                    intent.putExtra("catatan", data["catatan"])
                     context.startActivity(intent)
                 }
 
-                // =====================
-                // DELETE
-                // =====================
                 "Delete" -> {
-
                     AlertDialog.Builder(context)
                         .setTitle("Konfirmasi")
                         .setMessage("Yakin hapus data?")
-                        .setPositiveButton(
-                            "Ya"
-                        ) { _, _ ->
-
-                            hapusData(
-                                data["id"].toString()
-                            )
-                        }
-
-                        .setNegativeButton(
-                            "Tidak",
-                            null
-                        )
-
+                        .setPositiveButton("Ya") { _, _ -> hapusData(data["id"].toString()) }
+                        .setNegativeButton("Tidak", null)
                         .show()
                 }
             }
-
             true
         }
 
@@ -156,43 +80,25 @@ class ParameterAdapter(
     }
 
     private fun hapusData(id: String) {
-
-        val url =
-            "http://192.168.1.22:8000/api/parameter-produk/delete/$id"
+        val url = "${ApiConfig.PARAMETER_URL}/delete/$id"
 
         val request = object : StringRequest(
             Request.Method.POST,
             url,
-
             {
-                Toast.makeText(
-                    context,
-                    "Data berhasil dihapus",
-                    Toast.LENGTH_SHORT
-                ).show()
-
+                Toast.makeText(context, "Data berhasil dihapus", Toast.LENGTH_SHORT).show()
                 if (context is ParameterActivity) {
                     context.getData()
                 }
             },
-
             { error ->
-
-                Toast.makeText(
-                    context,
-                    error.toString(),
-                    Toast.LENGTH_LONG
-                ).show()
+                val pesan = error.networkResponse?.data?.let { String(it) } ?: error.toString()
+                Toast.makeText(context, pesan, Toast.LENGTH_LONG).show()
             }
-
         ) {}
 
-        Volley.newRequestQueue(context)
-            .add(request)
+        Volley.newRequestQueue(context).add(request)
     }
 
-    override fun getItemCount(): Int {
-
-        return list.size
-    }
+    override fun getItemCount(): Int = list.size
 }

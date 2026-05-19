@@ -14,7 +14,7 @@ class TambahProdukActivity : AppCompatActivity() {
 
     lateinit var b: ActivityTambahProdukBinding
 
-    private val baseUrl = "http://192.168.1.22:8000/api/produk"
+    private val baseUrl = ApiConfig.PRODUK_URL
 
     private var mode = "TAMBAH"
     private var id = ""
@@ -45,8 +45,6 @@ class TambahProdukActivity : AppCompatActivity() {
             id = intent.getStringExtra("id") ?: ""
 
             Log.d("DEBUG_ID", "ID PRODUK = $id")
-
-            Toast.makeText(this, "ID = $id", Toast.LENGTH_LONG).show()
 
             b.etNama.setText(intent.getStringExtra("namaProduk") ?: "")
 
@@ -114,6 +112,14 @@ class TambahProdukActivity : AppCompatActivity() {
             return false
         }
 
+        if (b.etMinStok.text.toString().trim().isEmpty()) {
+
+            b.etMinStok.error = "Stok minimum wajib diisi"
+            b.etMinStok.requestFocus()
+
+            return false
+        }
+
         return true
     }
 
@@ -121,7 +127,7 @@ class TambahProdukActivity : AppCompatActivity() {
     private fun simpanData() {
 
         val request = object : StringRequest(
-            Method.POST,
+            Request.Method.POST,
             baseUrl,
 
             {
@@ -168,8 +174,6 @@ class TambahProdukActivity : AppCompatActivity() {
 
                 params["stokMinimum"] =
                     b.etMinStok.text.toString()
-
-                params["stokSaatIni"] = "0"
 
                 params["aktifDijual"] =
                     if (b.cbAktif.isChecked) "1" else "0"
@@ -253,8 +257,6 @@ class TambahProdukActivity : AppCompatActivity() {
                     b.etMinStok.text.toString()
 
                 // PENTING
-                params["stokSaatIni"] = "0"
-
                 params["aktifDijual"] =
                     if (b.cbAktif.isChecked) "1" else "0"
 

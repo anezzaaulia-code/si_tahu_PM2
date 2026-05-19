@@ -33,17 +33,14 @@ class AdapterDataProduk(
         val stok = data["stok"] ?: "0"
         val satuan = data["satuan"] ?: ""
         val jenis = data["jenisProduk"] ?: "DASAR"
+        val aktif = data["aktifDijual"] == "1"
 
         with(holder.binding) {
-
             tvInisial.text = if (nama.isNotEmpty()) nama.substring(0, 1).uppercase() else "-"
-
             tvNama.text = nama
-
-            tvDeskripsi.text = "$jenis • Aktif"
-
+            tvDeskripsi.text = "$jenis • ${if (aktif) "Aktif dijual" else "Nonaktif"}"
             tvNilai.text = "$stok $satuan"
-
+            badgeAktif.text = if (aktif) "Aktif" else "Nonaktif"
             badgeTipe.text = "Stok"
 
             btnMore.setOnClickListener {
@@ -59,12 +56,9 @@ class AdapterDataProduk(
         popup.menu.add("Delete")
 
         popup.setOnMenuItemClickListener {
-
             when (it.title) {
-
                 "Edit" -> {
                     val intent = Intent(context, TambahProdukActivity::class.java)
-
                     intent.putExtra("MODE", "EDIT")
                     intent.putExtra("id", data["id"])
                     intent.putExtra("namaProduk", data["namaProduk"])
@@ -73,7 +67,6 @@ class AdapterDataProduk(
                     intent.putExtra("stokMinimum", data["stokMinimum"])
                     intent.putExtra("aktifDijual", data["aktifDijual"])
                     intent.putExtra("tampilDiKasir", data["tampilDiKasir"])
-
                     context.startActivity(intent)
                 }
 
@@ -88,7 +81,6 @@ class AdapterDataProduk(
                         .show()
                 }
             }
-
             true
         }
 
@@ -96,21 +88,20 @@ class AdapterDataProduk(
     }
 
     private fun hapusData(id: String) {
-
-        val url = "http://192.168.1.22:8000/api/produk/delete/$id"
+        val url = "${ApiConfig.PRODUK_URL}/delete/$id"
 
         val request = object : StringRequest(
             Request.Method.POST,
             url,
             {
                 Toast.makeText(context, "Data berhasil dihapus", Toast.LENGTH_SHORT).show()
-
                 if (context is MainActivity) {
-                    context.showDataProduk("")
+                    context.showDataProduk()
                 }
             },
-            {
-                Toast.makeText(context, "Gagal hapus data", Toast.LENGTH_SHORT).show()
+            { error ->
+                val pesan = error.networkResponse?.data?.let { String(it) } ?: error.toString()
+                Toast.makeText(context, pesan, Toast.LENGTH_LONG).show()
             }
         ) {}
 

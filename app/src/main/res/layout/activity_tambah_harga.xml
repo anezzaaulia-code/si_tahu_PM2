@@ -12,7 +12,6 @@
         android:orientation="vertical"
         android:padding="20dp">
 
-        <!-- HEADER -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -27,7 +26,7 @@
                 android:layout_height="28dp"
                 android:src="@android:drawable/ic_menu_revert"
                 android:layout_marginEnd="16dp"
-                app:tint="#1A1A1A"/>
+                app:tint="#1A1A1A" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -37,7 +36,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Form Harga Kanal"
+                    android:text="Form Harga"
                     android:textSize="22sp"
                     android:textColor="#1A1A1A"
                     android:textStyle="bold" />
@@ -45,13 +44,34 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tambah atau edit harga kanal"
+                    android:text="Tambah atau edit harga produk"
                     android:textColor="#6B7262"
                     android:textSize="14sp" />
             </LinearLayout>
         </LinearLayout>
 
-        <!-- INPUT: NAMA PRODUK -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:boxCornerRadiusBottomEnd="16dp"
+            app:boxCornerRadiusBottomStart="16dp"
+            app:boxCornerRadiusTopEnd="16dp"
+            app:boxCornerRadiusTopStart="16dp"
+            app:boxBackgroundColor="@android:color/white"
+            app:boxStrokeColor="#C4C8C4"
+            app:hintEnabled="false">
+
+            <AutoCompleteTextView
+                android:id="@+id/spinnerProduk"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Pilih produk"
+                android:inputType="none"
+                android:padding="16dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
@@ -66,38 +86,14 @@
             app:hintEnabled="false">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etNamaProduk"
+                android:id="@+id/etNamaHarga"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Nama Produk (Misal: Tahu Bulat)"
+                android:hint="Nama harga"
                 android:textColorHint="#1A1A1A"
                 android:padding="16dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- INPUT: NAMA KANAL -->
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:boxCornerRadiusBottomEnd="16dp"
-            app:boxCornerRadiusBottomStart="16dp"
-            app:boxCornerRadiusTopEnd="16dp"
-            app:boxCornerRadiusTopStart="16dp"
-            app:boxBackgroundColor="@android:color/white"
-            app:boxStrokeColor="#C4C8C4"
-            app:hintEnabled="false">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etNamaKanal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Nama Kanal (Misal: Pasar)"
-                android:textColorHint="#1A1A1A"
-                android:padding="16dp" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- INPUT: HARGA -->
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
@@ -116,12 +112,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="number"
-                android:hint="Harga (Misal: 1500)"
+                android:hint="Harga satuan"
                 android:textColorHint="#1A1A1A"
                 android:padding="16dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- KOTAK CHECKBOX -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -142,7 +137,7 @@
                     android:id="@+id/cbKanalAktif"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Kanal aktif"
+                    android:text="Harga aktif"
                     android:textSize="16sp"
                     android:textColor="#1A1A1A"
                     android:checked="true"
@@ -161,12 +156,11 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- TOMBOL SIMPAN -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSimpanHarga"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:text="Simpan Harga Kanal"
+            android:text="Simpan Harga"
             android:textAllCaps="false"
             android:textSize="16sp"
             android:textStyle="bold"
